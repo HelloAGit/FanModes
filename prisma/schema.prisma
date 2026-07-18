@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime @default(now())
+  profile       Profile?
+  groups        GroupMember[]
+  notifications Notification[]
+}
+
+model Profile {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+  settings Json   @default("{}")
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String
+  avatarUrl   String?
+  isPrivate   Boolean  @default(true)
+  createdById String
+  createdAt   DateTime @default(now())
+  members     GroupMember[]
+  matches     GroupMatch[]
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  role    String @default("member")
+  assignedTeam String?
+  points  Int    @default(0)
+}
+
+model Match {
+  id            String   @id
+  competition   String
+  homeTeam      String
+  awayTeam      String
+  startAt       DateTime
+  status        String
+  txlineFixtureId String @unique
+  events        MatchEvent[]
+  createdAt     DateTime @default(now())
+}
+
+model MatchEvent {
+  id            String   @id @default(uuid())
+  match         Match    @relation(fields: [matchId], references: [id])
+  matchId       String
+  sequence      Int
+  eventType     String
+  payload       Json
+  timestamp     DateTime
+  proofRef      String?
+}
+
+model SweepstakePoint {
+  id        String @id @default(uuid())
+  group     Group  @relation(fields: [groupId], references: [id])
+  groupId   String
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+  matchId   String
+  points    Int
+  createdAt DateTime @default(now())
+}
+
+model HiLoSession {
+  id         String @id @default(uuid())
+  user       User   @relation(fields: [userId], references: [id])
+  userId     String
+  matchId    String
+  statKey    String
+  referenceValue Float
+  streak     Int @default(0)
+  createdAt  DateTime @default(now())
+}
