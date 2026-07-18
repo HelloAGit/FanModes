@@ -1,4 +1,4 @@
-# FanModes — TxLINE Fan Modes
+# FanModes: TxLINE Fan Modes
 
 Mobile-first second-screen experience for football fans. Built with Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, and Supabase/Postgres.
 
